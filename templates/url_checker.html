@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>URL checker</title>
+</head>
+<body>
+<script
+  src="https://code.jquery.com/jquery-3.4.1.js"
+  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+  crossorigin="anonymous"></script>
+
+<table class="urls_table" border="1" style="width: 100%; text-align: center">
+{% for URL in all_urls_for_check%}
+    <tr>
+        <td id="url-row-{{ URL.id }}">{{ URL.url }}</td>
+    </tr>
+    <script>
+        let interval_{{ URL.id }} = {{ URL.interval }} * 1000;
+        setInterval(function (){
+            manage_response(`url-row-{{ URL.id }}`)
+        }, interval_{{ URL.id }});
+    </script>
+{% endfor %}
+</table>
+
+<style>
+.greenBg {
+    background: green;
+}
+.redBg {
+    background: red;
+}
+</style>
+
+<script>
+
+    function manage_response (id) {
+        let self = $(`#${id}`);
+        let path = self.text();
+        let code = 404;
+        $.ajax({url:path,
+                crossDomain: true,
+                dataType: 'jsonp',
+                complete: function(xhr, textStatus) {
+                    {#console.log(xhr.status.toString());#}
+                    code = +xhr.status;
+                    self.removeClass();
+                    if (code === 200){
+                        self.addClass('greenBg');
+                    }else{
+                        self.addClass('redBg');
+                    }
+                }
+        });
+    };
+
+</script>
+
+
+</body>
+</html>
